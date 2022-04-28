@@ -77,15 +77,18 @@ class FPSim2Engine(BaseEngine):
         self.empty_sim = np.ndarray((0,), dtype=[("mol_id", "<u4"), ("coeff", "<f4")])
         self.empty_subs = np.ndarray((0,), dtype="<u4")
 
+        # TODO not accessable this way
+        self.fp_typing = np.ndarray[(self.fp_params[self.fp_type["nBits"]])]
+
     def similarity(
-        self, query_string: str, threshold: float, n_workers=1
+        self, query: Union(str, np.ndarray), threshold: float, n_workers=1
     ) -> np.ndarray:
         """Runs a Tanimoto search.
 
         Parameters
         ----------
-        query_string : str
-            SMILES, InChI or molblock.
+        query : str or numpy array
+            SMILES, InChI, molblock or fingerprint
 
         threshold: float
             Similarity threshold.
@@ -103,7 +106,7 @@ class FPSim2Engine(BaseEngine):
                 "Load the fingerprints into memory before running a in memory search"
             )
 
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, threshold, None, None, self.popcnt_bins, "tanimoto"
         )
@@ -129,7 +132,7 @@ class FPSim2Engine(BaseEngine):
 
     def on_disk_similarity(
         self,
-        query_string: str,
+        query: Union(str, np.ndarray),
         threshold: float,
         n_workers: int = 1,
         chunk_size: int = 0,
@@ -138,8 +141,8 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query_string : str
-            SMILES, InChI or molblock.
+        query: str or numpy array
+            SMILES, InChI, molblock or fingerprint
 
         threshold: float
             Similarity threshold.
@@ -158,7 +161,7 @@ class FPSim2Engine(BaseEngine):
         if not chunk_size:
             chunk_size = self.storage.chunk_size
 
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, threshold, None, None, self.popcnt_bins, "tanimoto"
         )
@@ -185,7 +188,7 @@ class FPSim2Engine(BaseEngine):
 
     def tversky(
         self,
-        query_string: str,
+        query: Union(str, np.array),
         threshold: float,
         a: float,
         b: float,
@@ -195,8 +198,8 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query_string : str
-            SMILES, InChI or molblock.
+        query : str or numpy array
+            SMILES, InChI, molblock or fingerprint
 
         threshold: float
             Similarity threshold.
@@ -223,7 +226,7 @@ class FPSim2Engine(BaseEngine):
                 "Load the fingerprints into memory before running a in memory search"
             )
 
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, threshold, a, b, self.popcnt_bins, "tversky"
         )
@@ -248,7 +251,7 @@ class FPSim2Engine(BaseEngine):
 
     def on_disk_tversky(
         self,
-        query_string: str,
+        query: Union(str, np.ndarray),
         threshold: float,
         a: float,
         b: float,
@@ -259,8 +262,8 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query_string : str
-            SMILES, InChI or molblock.
+        query : str
+            SMILES, InChI, molblock or fingerprint
 
         threshold: float
             Similarity threshold.
@@ -285,7 +288,7 @@ class FPSim2Engine(BaseEngine):
         if not chunk_size:
             chunk_size = self.storage.chunk_size
 
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, threshold, a, b, self.popcnt_bins, "tversky"
         )
@@ -310,12 +313,12 @@ class FPSim2Engine(BaseEngine):
                 )
         return results[["mol_id", "coeff"]]
 
-    def substructure(self, query_string: str, n_workers: int = 1) -> np.ndarray:
+    def substructure(self, query: str, n_workers: int = 1) -> np.ndarray:
         """Run a substructure screenout using an optimised calculation of tversky wiht a=1, b=0
 
         Parameters
         ----------
-        query_string : str
+        query : str
             SMILES, InChI or molblock.
 
         n_workers : int
@@ -333,7 +336,7 @@ class FPSim2Engine(BaseEngine):
             raise Exception(
                 "Load the fingerprints into memory before running a in memory search"
             )
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, 1, None, None, self.popcnt_bins, "substructure"
         )
@@ -357,13 +360,13 @@ class FPSim2Engine(BaseEngine):
         return results
 
     def on_disk_substructure(
-        self, query_string: str, n_workers: int = 1, chunk_size: int = None
+        self, query: str, n_workers: int = 1, chunk_size: int = None
     ) -> np.ndarray:
         """Run a on disk substructure screenout.
 
         Parameters
         ----------
-        query_string : str
+        query : str
             SMILES, InChI or molblock.
 
         n_workers : int
@@ -380,7 +383,7 @@ class FPSim2Engine(BaseEngine):
         if not chunk_size:
             chunk_size = self.storage.chunk_size
 
-        np_query = self.load_query(query_string)
+        np_query = self.load_query(query)
         bounds = get_bounds_range(
             np_query, 1, None, None, self.popcnt_bins, "substructure"
         )

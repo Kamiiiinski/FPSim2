@@ -120,7 +120,7 @@ class BuildExt(build_ext):
 
 
 setup(
-    name="FPSim2",
+    name="FPSim2_fpq",
     version=get_version("FPSim2/__init__.py"),
     author="Eloy Felix",
     author_email="eloyfelix@gmail.com",
@@ -135,7 +135,7 @@ setup(
     cmdclass={"build_ext": BuildExt},
     zip_safe=False,
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
