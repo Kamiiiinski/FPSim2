@@ -86,11 +86,24 @@ def rdmol_to_efp(
     fp = FP_FUNCS[fp_func](rdmol, **fp_params)
     return BitStrToIntList(fp.ToBitString())
 
+
 def build_fp(rdmol, fp_type, fp_params, mol_id):
     efp = rdmol_to_efp(rdmol, fp_type, fp_params)
     popcnt = PyPopcount(np.array(efp, dtype=np.uint64))
     fp = (mol_id, *efp, popcnt)
     return fp
+
+
+def modify_fp(fp: np.ndarray[Any, np.int_], mol_id: int):
+    fp_as_str = ''
+    for i in fp:
+        fp_as_str += str(i)
+
+    efp = BitStrToIntList(fp_as_str)
+    popcnt = PyPopcount(np.array(efp, dtype=np.uint64))
+    fp = (mol_id, *efp, popcnt)
+    return fp
+
 
 def load_molecule(mol_string: str) -> Chem.Mol:
     """Reads SMILES, molblock or InChI and returns a RDKit mol.

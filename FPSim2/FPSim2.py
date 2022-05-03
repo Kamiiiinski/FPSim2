@@ -11,7 +11,6 @@ from .base import BaseEngine
 from scipy import sparse
 import numpy as np
 
-
 def on_disk_search(
     search_func: str, query: np.array, storage: Any, args, chunk: Tuple[int, int],
 ) -> np.ndarray:
@@ -77,17 +76,15 @@ class FPSim2Engine(BaseEngine):
         self.empty_sim = np.ndarray((0,), dtype=[("mol_id", "<u4"), ("coeff", "<f4")])
         self.empty_subs = np.ndarray((0,), dtype="<u4")
 
-        # TODO not accessable this way
-        self.fp_typing = np.ndarray[(self.fp_params[self.fp_type["nBits"]])]
 
     def similarity(
-        self, query: Union(str, np.ndarray), threshold: float, n_workers=1
+        self, query: Union[str, np.ndarray], threshold: float, n_workers=1
     ) -> np.ndarray:
         """Runs a Tanimoto search.
 
         Parameters
         ----------
-        query : str or numpy array
+        query : str, numpy array
             SMILES, InChI, molblock or fingerprint
 
         threshold: float
@@ -132,7 +129,7 @@ class FPSim2Engine(BaseEngine):
 
     def on_disk_similarity(
         self,
-        query: Union(str, np.ndarray),
+        query: Union[str, np.ndarray],
         threshold: float,
         n_workers: int = 1,
         chunk_size: int = 0,
@@ -141,7 +138,7 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query: str or numpy array
+        query: str, numpy array
             SMILES, InChI, molblock or fingerprint
 
         threshold: float
@@ -188,7 +185,7 @@ class FPSim2Engine(BaseEngine):
 
     def tversky(
         self,
-        query: Union(str, np.array),
+        query: Union[str, np.array],
         threshold: float,
         a: float,
         b: float,
@@ -198,7 +195,7 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query : str or numpy array
+        query : str, numpy array
             SMILES, InChI, molblock or fingerprint
 
         threshold: float
@@ -251,7 +248,7 @@ class FPSim2Engine(BaseEngine):
 
     def on_disk_tversky(
         self,
-        query: Union(str, np.ndarray),
+        query: Union[str, np.ndarray],
         threshold: float,
         a: float,
         b: float,
@@ -262,7 +259,7 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query : str
+        query : str, numpy array
             SMILES, InChI, molblock or fingerprint
 
         threshold: float
@@ -318,8 +315,8 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query : str
-            SMILES, InChI or molblock.
+        query : str, numpy array
+            SMILES, InChI, molblock or fingerprint
 
         n_workers : int
             Number of processes used for the search.
@@ -366,8 +363,8 @@ class FPSim2Engine(BaseEngine):
 
         Parameters
         ----------
-        query : str
-            SMILES, InChI or molblock.
+        query : str, numpy array
+            SMILES, InChI, molblock or fingerprint
 
         n_workers : int
             Number of processes used for the search.

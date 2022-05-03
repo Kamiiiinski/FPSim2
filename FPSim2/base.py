@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from .io.chem import load_molecule, build_fp
+from .io.chem import load_molecule, build_fp, modify_fp
 from .io.backends import PyTablesStorageBackend
 from .FPSim2lib.utils import PyPopcount
+from typing import Union
 import numpy as np
 
 
@@ -48,25 +49,32 @@ class BaseEngine(ABC):
     def rdkit_ver(self):
         return self.storage.rdkit_ver
 
-    def load_query(self, query_string: str) -> np.ndarray:
-        """Loads the query molecule from SMILES, molblock or InChI.
+    def load_query(self, query: Union[str, np.ndarray]) -> np.ndarray:
+        """Loads the query molecule from SMILES, molblock, InChI
+        or fingerprint.
 
         Parameters
         ----------
-        query_string : str
-            SMILES, InChi or molblock.
+        query : str or numpy array
+            SMILES, InChi, molblock or fingerprint.
 
         Returns
         -------
         query : numpy array
             Numpy array query molecule.
         """
-        rdmol = load_molecule(query_string)
-        fp = build_fp(rdmol, self.fp_type, self.fp_params, 0)
-        return np.array(fp, dtype=np.uint64)
+        if type(query) == np.ndarray:
+            assert self.fp_params["nBits"] == len(query),\
+                   "Fingerprint length does not match!"
+            fp = modify_fp(query, 0)
+            return np.array(fp, dtype=np.uint64)
+        else:
+            rdmol = load_molecule(query)
+            fp = build_fp(rdmol, self.fp_type, self.fp_params, 0)
+            return np.array(fp, dtype=np.uint64)
 
     @abstractmethod
     def similarity(
-        self, query_string: str, threshold: float, n_workers=1
+        self, query: str, threshold: float, n_workers=1
     ) -> np.ndarray:
         """Tanimoto similarity search """
